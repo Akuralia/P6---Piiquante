@@ -1,8 +1,22 @@
 const express = require('express');
-const mongoose = require('./models/dbConfig');
-const sauces = require('./models/Sauces');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const path = require('path');
+
+const dotenv = require("dotenv");
+dotenv.config();
+
+mongoose.connect(process.env.MONGO_URI,
+  { useNewUrlParser: true,
+    useUnifiedTopology: true })
+  .then(() => console.log('Connexion à MongoDB réussie !'))
+  .catch(() => console.log('Connexion à MongoDB échouée !'));
+
+const sauceRoutes = require('./routes/sauce');
 const userRoutes = require('./routes/user');
+
 const app = express();
+app.use(express.json());
 
 // CORS
 app.use((req, res, next) => {
@@ -12,18 +26,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// POST routes user
-app.use('/api/auth', userRoutes);
+app.use(bodyParser.json());
 
-// POST des sauces
-app.post('/api/sauces', (req, res, next) => {
-  delete req.body._id;
-  const thing = new Sauces({
-    ...req.body
-  });
-  sauces.save()
-    .then(() => res.status(201).json({ message: 'Sauce enregistré !'}))
-    .catch(error => res.status(400).json({ error }));
-});
+app.use('/api/sauces', sauceRoutes);
+app.use('/api/auth', userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
