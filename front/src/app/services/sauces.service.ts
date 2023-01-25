@@ -61,7 +61,7 @@ export class SaucesService {
 
   modifySauce(id: string, sauce: Sauce, image: string | File) {
     if (typeof image === 'string') {
-      return this.http.put<{ message: string }>('http://localhost:3000/api/sauces/' + id, sauce).pipe(
+      return this.http.put<{ message: string }>('https://localhost:3000/api/sauces/' + id, sauce).pipe(
         catchError(error => throwError(error.error.message))
       );
     } else {
