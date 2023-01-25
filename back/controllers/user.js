@@ -1,5 +1,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const MaskData = require('maskdata');
+const dotenv = require('dotenv').config()
+const Maskdata = require('maskdata'); // Permet de masquer différent type de données (email, mot de passe, champs JSON, etc...)
+const sha1 = require('sha1'); // Fonction native JS pour le hachage des messages avec l'algorithme SHA-1
 
 const User = require('../models/User');
 
@@ -8,7 +12,8 @@ exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
         const user = new User({
-          email: req.body.email,
+          email: sha1(req.body.email),
+          email_mask: MaskData.maskEmail12(req.body.email),
           password: hash
         });
         user.save()
@@ -19,7 +24,7 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-    User.findOne({ email: req.body.email })
+    User.findOne({ email: sha1(req.body.email) })
         .then(user => {
             if (!user) {
                 return res.status(401).json({ error: 'Utilisateur non trouvé !' });

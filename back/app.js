@@ -6,7 +6,7 @@ const cors = require('cors');
 const app = express();
 const fs = require('fs');
 
-
+const helmet = require('helmet');
 const session = require('express-session');
 const morgan = require('morgan');
 const nocache = require('nocache');
@@ -25,6 +25,8 @@ mongoose.connect(process.env.MONGO_URI,
 
 app.use(cors());
 
+/* Permet de sécuriser l'application Express en applicant divers en-tête HTTP */
+app.use(helmet());
 
 /* Options de sécurisation des cookies */
 const expiryDate = new Date( Date.now() + 60 * 60 * 1000 ); // 1 hour
